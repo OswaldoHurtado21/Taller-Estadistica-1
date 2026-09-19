@@ -1,0 +1,86 @@
+---
+title: "Taller numero1 Estadistica"
+author: "David Morales, Dilan Martinez, Oswaldo Hurtado"
+date: "2026-09-17"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(dplyr)
+library(ggplot2)
+library(palmerpenguins)
+```
+Punto 1.Limpieza en la tabla de la base de datos.
+
+
+Link video: https://www.youtube.com/watch?v=K3f92gON37U
+
+```{r ejericio_1}
+
+limpieza_base <- penguins %>%
+  filter(!is.na(sex)) %>%
+  group_by(species, sex) %>%
+  summarise(
+    Media_Masa = mean(body_mass_g, na.rm = TRUE),
+    Desviacion_Masa = sd(body_mass_g, na.rm = TRUE),
+    Conteo = n()
+  ) 
+  
+
+# Mostrar la tabla resultante
+knitr::kable(limpieza_base, col.names= c("Especie", "Sexo", "Media masa (g)", "Desviacion Estandar", "Conteo"))
+```
+Los resultados estadísticos descriptivos reflejan que cada uno de los ejemplares de sexo masculino presentan un promedio de masa corporal notablemente superior al de las hembras. Biológicamente, esto es consistente con las características físicas de estas aves marinas, donde los machos suelen desarrollar mayor tamaño corporal, destacando la especie Gentoo como la más pesada del conjunto de datos.
+
+
+
+Punto 2. Diagrama de dispersion 
+```{r ejercicio_2}
+ggplot(data = penguins, aes(x = bill_length_mm, y = body_mass_g, color = species)) +
+  geom_point(size = 2.5, alpha = 0.8) +
+  labs(
+    title = "Relación entre longitud del pico y masa corporal",
+    subtitle = "Evaluacion por especies",
+    x = "Longitud del Pico (mm)",
+    y = "Masa Corporal (g)",
+    color = "Especie"
+  ) +
+  theme_minimal()
+```
+
+
+La gráfica nos muestra una tendencia positiva donde los pingüinos con picos más largos tienden a registrar una mayor masa corporal. Sin embargo, al observar la distribución por colores, se identifica que la especie actúa como una variable de agrupación fundamental: los pingüinos Gentoo se posicionan claramente hacia los valores más altos de peso y longitud de pico, mientras que los Adelie se concentran en rangos menores, haciendonos muestra de que sus proporciones morfológicas estan directamente realacionadas según la línea evolutiva de cada especie.
+
+
+Punto 3. Incorporacion de la regresion lineal por especie
+```{r ejercicio_3}
+ggplot(data = penguins, aes(x = bill_length_mm, y = body_mass_g, color = species)) +
+  geom_point(size = 2.5, alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Tendencia del crecimiento con la regresión lineal",
+    subtitle = "Masa corporal vs Longitud del pico por especie",
+    x = "Longitud del Pico (mm)",
+    y = "Masa Corporal (g)",
+    color = "Especie"
+  ) +
+  theme_minimal()
+```
+
+Al agregar las lineas de regresion al diagrama de dispersion podeos notar que por medio de las pendientes positivas de las rectas nos confirman la correlación directa entre el tamaño del pico y el peso corporal dentro de cada especie analizada de forma independiente. Esto demuestra que, aunque el conjunto total de datos puede sugerir una pendiente general, realizar el desglose por especie evita sesgos estadísticos y resalta las adaptaciones físicas que desarrollaron de manera particular cada especie en base a su hábitat natural.
+
+Punto 4.Comparacion con boxsplot
+```{r ejercicio_4}
+ggplot(data = penguins, aes(x = species, y = flipper_length_mm, fill = species)) +
+  geom_boxplot(alpha = 0.7, outlier.color = "red") +
+  scale_fill_manual(values = c("lightblue", "orange", "purple")) + 
+  labs(
+    title = "Comparación de la Longitud de aletas por especie",
+    x = "Especie de Pingüino",
+    y = "Longitud de la Aleta (mm)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+El diagrama de caja nos muestra diferencias muy marcadas en las medianas y los rangos intercuartílicos de la longitud de las aletas entre cada una de las especies evaluadas. Resaltando la especie de los pingüinos Gentoo donde esta especie presenta aletas considerablemente más largas (con valores que superan frecuentemente los 210 mm), en contraste con las especies Adelie y Chinstrap, cuyas aletas son más cortas y se sitúan en rangos inferiores.Esto nos indica que desde el punto de vista biológico, la longitud de las aletas está directamente relacionada con la eficiencia que necesita cada especie en su impulso y forma de nado de cada especie en las aguas del Ántártico.
